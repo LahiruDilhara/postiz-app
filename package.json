@@ -58,7 +58,6 @@
     "@langchain/core": "^0.3.44",
     "@langchain/langgraph": "^0.2.63",
     "@langchain/openai": "^0.5.5",
-    "@meronex/icons": "^4.0.0",
     "@mantine/core": "^5.10.5",
     "@mantine/dates": "^5.10.5",
     "@mantine/hooks": "^5.10.5",
@@ -66,6 +65,7 @@
     "@mastra/core": "^0.20.2",
     "@mastra/memory": "^0.15.6",
     "@mastra/pg": "^0.17.2",
+    "@meronex/icons": "^4.0.0",
     "@modelcontextprotocol/sdk": "^1.22.0",
     "@nest-lab/throttler-storage-redis": "^1.2.0",
     "@nestjs/cli": "10.0.2",
@@ -326,7 +326,26 @@
       "@types/react-dom": "19.1.6"
     },
     "onlyBuiltDependencies": [
-      "bcrypt"
+      "@nestjs/core",
+      "@openapitools/openapi-generator-cli",
+      "@parcel/watcher",
+      "@prisma/client",
+      "@prisma/engines",
+      "@scarf/scarf",
+      "@sentry-internal/node-cpu-profiler",
+      "@sentry/cli",
+      "@swc/core",
+      "bcrypt",
+      "bufferutil",
+      "canvas",
+      "core-js",
+      "core-js-pure",
+      "esbuild",
+      "prisma",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver",
+      "utf-8-validate"
     ]
   }
 }
