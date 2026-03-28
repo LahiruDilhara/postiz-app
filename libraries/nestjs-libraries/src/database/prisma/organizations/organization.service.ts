@@ -73,10 +73,6 @@ export class OrganizationService {
     return this._organizationRepository.setStreak(organizationId, type);
   }
 
-  getOrgByCustomerId(customerId: string) {
-    return this._organizationRepository.getOrgByCustomerId(customerId);
-  }
-
   async inviteTeamMember(orgId: string, body: AddTeamMemberDto) {
     const timeLimit = dayjs().add(1, 'hour').format('YYYY-MM-DD HH:mm:ss');
     const id = makeId(5);

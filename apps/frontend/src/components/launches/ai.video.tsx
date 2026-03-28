@@ -5,11 +5,9 @@ import Loading from '@gitroom/frontend/components/layout/loading';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useLaunchStore } from '@gitroom/frontend/components/new-launch/store';
-import useSWR from 'swr';
 import { TopTitle } from '@gitroom/frontend/components/launches/helpers/top.title.component';
 import { VideoWrapper } from '@gitroom/frontend/components/videos/video.render.component';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { VideoContextWrapper } from '@gitroom/frontend/components/videos/video.context.wrapper';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 
@@ -26,16 +24,6 @@ export const Modal: FC<{
   const form = useForm();
   const [position, setPosition] = useState('vertical');
   const toaster = useToaster();
-
-  const loadCredits = useCallback(async () => {
-    return (
-      await fetch(`/copilot/credits?type=ai_videos`, {
-        method: 'GET',
-      })
-    ).json();
-  }, []);
-
-  const { data, mutate } = useSWR('copilot-credits', loadCredits);
 
   const generate = useCallback(async () => {
     await fetch(`/media/generate-video/${type.identifier}/allowed`);
@@ -79,11 +67,7 @@ export const Modal: FC<{
               <div className="flex gap-[10px] flex-col w-[500px] h-auto bg-sixth border-tableBorder border-2 rounded-xl pb-[20px] px-[20px] relative">
                 <div className="flex">
                   <div className="flex-1">
-                    <TopTitle title={'Video Type'}>
-                      <div className="mr-[25px]">
-                        {data?.credits || 0} credits left
-                      </div>
-                    </TopTitle>
+                    <TopTitle title={'Video Type'} />
                   </div>
                   <button
                     onClick={props.close}
@@ -155,7 +139,6 @@ export const AiVideo: FC<{
   const [type, setType] = useState<any | null>(null);
   const [modal, setModal] = useState(false);
   const fetch = useFetch();
-  const { isTrailing } = useUser();
 
   const loadVideoList = useCallback(async () => {
     return (await (await fetch('/media/video-options')).json()).filter(

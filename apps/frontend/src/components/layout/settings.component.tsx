@@ -18,7 +18,6 @@ import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useSWRConfig } from 'swr';
 import clsx from 'clsx';
 import { TeamsComponent } from '@gitroom/frontend/components/settings/teams.component';
-import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { LogoutComponent } from '@gitroom/frontend/components/layout/logout.component';
 import { useSearchParams } from 'next/navigation';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
@@ -40,7 +39,6 @@ export const SettingsPopup: FC<{
   const fetch = useFetch();
   const toast = useToaster();
   const swr = useSWRConfig();
-  const user = useUser();
   const resolver = useMemo(() => {
     return classValidatorResolver(UserDetailDto);
   }, []);
@@ -53,7 +51,7 @@ export const SettingsPopup: FC<{
     return modal.closeAll();
   }, []);
   const url = useSearchParams();
-  const showLogout = !url.get('onboarding') || user?.tier?.current === 'FREE';
+  const showLogout = !url.get('onboarding');
   const loadProfile = useCallback(async () => {
     const personal = await (await fetch('/user/personal')).json();
     form.setValue('fullname', personal.name || '');
@@ -87,29 +85,20 @@ export const SettingsPopup: FC<{
   const list = useMemo(() => {
     const arr = [];
     arr.push({ tab: 'global_settings', label: t('global_settings', 'Global Settings') });
-    // Populate tabs based on user permissions
-    if (user?.tier?.team_members && isGeneral) {
+    if (isGeneral) {
       arr.push({ tab: 'teams', label: t('teams', 'Teams') });
     }
-    if (user?.tier?.webhooks) {
-      arr.push({ tab: 'webhooks', label: t('webhooks_1', 'Webhooks') });
-    }
-    if (user?.tier?.autoPost) {
-      arr.push({ tab: 'autopost', label: t('auto_post', 'Auto Post') });
-    }
-    if (user?.tier.current !== 'FREE') {
-      arr.push({ tab: 'sets', label: t('sets', 'Sets') });
-    }
-    if (user?.tier.current !== 'FREE') {
-      arr.push({ tab: 'signatures', label: t('signatures', 'Signatures') });
-    }
-    if (user?.tier?.public_api && isGeneral && showLogout) {
+    arr.push({ tab: 'webhooks', label: t('webhooks_1', 'Webhooks') });
+    arr.push({ tab: 'autopost', label: t('auto_post', 'Auto Post') });
+    arr.push({ tab: 'sets', label: t('sets', 'Sets') });
+    arr.push({ tab: 'signatures', label: t('signatures', 'Signatures') });
+    if (isGeneral && showLogout) {
       arr.push({ tab: 'api', label: t('developers', 'Developers') });
     }
     arr.push({ tab: 'approved_apps', label: t('approved_apps', 'Approved Apps') });
 
     return arr;
-  }, [user, isGeneral, showLogout, t]);
+  }, [isGeneral, showLogout, t]);
 
   useEffect(() => {
     loadProfile();
@@ -165,44 +154,41 @@ export const SettingsPopup: FC<{
                   <GlobalSettings />
                 </div>
               )}
-              {tab === 'teams' && !!user?.tier?.team_members && isGeneral && (
+              {tab === 'teams' && isGeneral && (
                 <div>
                   <TeamsComponent />
                 </div>
               )}
 
-              {tab === 'webhooks' && !!user?.tier?.webhooks && (
+              {tab === 'webhooks' && (
                 <div>
                   <Webhooks />
                 </div>
               )}
 
-              {tab === 'autopost' && !!user?.tier?.autoPost && (
+              {tab === 'autopost' && (
                 <div>
                   <Autopost />
                 </div>
               )}
 
-              {tab === 'sets' && user?.tier.current !== 'FREE' && (
+              {tab === 'sets' && (
                 <div>
                   <Sets />
                 </div>
               )}
 
-              {tab === 'signatures' && user?.tier.current !== 'FREE' && (
+              {tab === 'signatures' && (
                 <div>
                   <SignaturesComponent />
                 </div>
               )}
 
-              {tab === 'api' &&
-                !!user?.tier?.public_api &&
-                isGeneral &&
-                showLogout && (
-                  <div>
-                    <PublicComponent />
-                  </div>
-                )}
+              {tab === 'api' && isGeneral && showLogout && (
+                <div>
+                  <PublicComponent />
+                </div>
+              )}
 
               {tab === 'approved_apps' && (
                 <div>
@@ -217,27 +203,8 @@ export const SettingsPopup: FC<{
   );
 };
 export const SettingsComponent = () => {
-  const settings = useModals();
-  const user = useUser();
-  const openModal = useCallback(() => {
-    if (user?.tier.current !== 'FREE') {
-      return;
-    }
-    settings.openModal({
-      children: (
-        <div className="relative flex gap-[20px] flex-col flex-1 rounded-[4px] border border-customColor6 bg-sixth p-[16px] w-[500px] mx-auto">
-          <SettingsPopup />
-        </div>
-      ),
-      classNames: {
-        modal: 'bg-transparent text-textColor',
-      },
-      withCloseButton: false,
-      size: '100%',
-    });
-  }, [user]);
   return (
-    <Link href="/settings" onClick={openModal}>
+    <Link href="/settings">
       <svg
         width="40"
         height="40"

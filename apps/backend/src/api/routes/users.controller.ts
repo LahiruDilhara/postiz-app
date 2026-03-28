@@ -11,15 +11,12 @@ import {
 import { GetUserFromRequest } from '@gitroom/nestjs-libraries/user/user.from.request';
 import { sign } from 'jsonwebtoken';
 import { Organization, User } from '@prisma/client';
-import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
 import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.request';
-import { StripeService } from '@gitroom/nestjs-libraries/services/stripe.service';
 import { Response, Request } from 'express';
 import { AuthService } from '@gitroom/backend/services/auth/auth.service';
 import { OrganizationService } from '@gitroom/nestjs-libraries/database/prisma/organizations/organization.service';
 import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
 import { getCookieUrlFromDomain } from '@gitroom/helpers/subdomain/subdomain.management';
-import { pricing } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from '@gitroom/nestjs-libraries/database/prisma/users/users.service';
 import { UserDetailDto } from '@gitroom/nestjs-libraries/dtos/users/user.details.dto';
@@ -36,8 +33,6 @@ import { AuthorizationActions, Sections } from '@gitroom/backend/services/auth/p
 @Controller('/user')
 export class UsersController {
   constructor(
-    private _subscriptionService: SubscriptionService,
-    private _stripeService: StripeService,
     private _authService: AuthService,
     private _orgService: OrganizationService,
     private _userService: UsersService,
@@ -76,17 +71,11 @@ export class UsersController {
       ...user,
       orgId: organization.id,
       // @ts-ignore
-      totalChannels: !process.env.STRIPE_PUBLISHABLE_KEY ? 10000 : organization?.subscription?.totalChannels || pricing.FREE.channel,
-      // @ts-ignore
-      tier: organization?.subscription?.subscriptionTier || (!process.env.STRIPE_PUBLISHABLE_KEY ? 'ULTIMATE' : 'FREE'),
+      totalChannels: 10000,
       // @ts-ignore
       role: organization?.users[0]?.role,
-      // @ts-ignore
-      isLifetime: !!organization?.subscription?.isLifetime,
       admin: !!user.isSuperAdmin,
       impersonate: !!impersonate,
-      isTrailing: !process.env.STRIPE_PUBLISHABLE_KEY ? false : organization?.isTrailing,
-      allowTrial: organization?.allowTrial,
       streakSince: organization?.streakSince || null,
       // @ts-ignore
       publicApi: organization?.users[0]?.role === 'SUPERADMIN' || organization?.users[0]?.role === 'ADMIN' ? organization?.apiKey : '',
@@ -162,23 +151,6 @@ export class UsersController {
   @CheckPolicies([AuthorizationActions.Create, Sections.ADMIN])
   async rotateApiKey(@GetOrgFromRequest() organization: Organization) {
     return this._orgService.updateApiKey(organization.id);
-  }
-
-  @Get('/subscription')
-  @CheckPolicies([AuthorizationActions.Create, Sections.ADMIN])
-  async getSubscription(@GetOrgFromRequest() organization: Organization) {
-    const subscription =
-      await this._subscriptionService.getSubscriptionByOrganizationId(
-        organization.id
-      );
-
-    return subscription ? { subscription } : { subscription: undefined };
-  }
-
-  @Get('/subscription/tiers')
-  @CheckPolicies([AuthorizationActions.Create, Sections.ADMIN])
-  async tiers() {
-    return this._stripeService.getPackages();
   }
 
   @Post('/join-org')

@@ -23,7 +23,6 @@ import clsx from 'clsx';
 import { VideoFrame } from '@gitroom/react/helpers/video.frame';
 import { useUppyUploader } from '@gitroom/frontend/components/media/new.uploader';
 import dynamic from 'next/dynamic';
-import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { AiImage } from '@gitroom/frontend/components/launches/ai.image';
 import { DropFiles } from '@gitroom/frontend/components/layout/drop.files';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
@@ -651,7 +650,6 @@ export const MultiMediaComponent: FC<{
     information,
     mediaNotAvailable,
   } = props;
-  const user = useUser();
   const modals = useModals();
   const t = useT();
   useEffect(() => {
@@ -715,7 +713,7 @@ export const MultiMediaComponent: FC<{
   );
 
   const designMedia = useCallback(() => {
-    if (!!user?.tier?.ai && !dummy) {
+    if (!dummy) {
       modals.openModal({
         askClose: false,
         title: t('design_media', 'Design Media'),
@@ -725,7 +723,7 @@ export const MultiMediaComponent: FC<{
         ),
       });
     }
-  }, [changeMedia, t]);
+  }, [changeMedia, dummy, modals, t]);
 
   return (
     <>
@@ -830,12 +828,10 @@ export const MultiMediaComponent: FC<{
 
               <ThirdPartyMedia allData={allData} onChange={changeMedia} />
 
-              {!!user?.tier?.ai && (
-                <>
-                  <AiImage value={text} onChange={changeMedia} />
-                  <AiVideo value={text} onChange={changeMedia} />
-                </>
-              )}
+              <>
+                <AiImage value={text} onChange={changeMedia} />
+                <AiVideo value={text} onChange={changeMedia} />
+              </>
             </div>
           )}
           {!mediaNotAvailable && (
@@ -885,7 +881,6 @@ export const MediaComponent: FC<{
   const { name, type, label, description, onChange, value, width, height } =
     props;
   const { getValues } = useSettings();
-  const user = useUser();
   useEffect(() => {
     const settings = getValues()[props.name];
     if (settings) {

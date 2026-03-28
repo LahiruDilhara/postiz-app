@@ -88,35 +88,14 @@ function LayoutContextInner(params: { children: ReactNode }) {
         window.location.href = '/';
       }
       if (response.status === 406) {
-        if (
-          await deleteDialog(
-            'You are currently on trial, in order to use the feature you must finish the trial',
-            'Finish the trial, charge me now',
-            'Trial',
-
-          )
-        ) {
-          window.open('/billing?finishTrial=true', '_blank');
-          return false;
-        }
+        await deleteDialog(
+          'This feature is not available for your account.',
+          'OK',
+          'Not available'
+        );
         return false;
       }
 
-      if (response.status === 402) {
-        if (
-          await deleteDialog(
-            (
-              await response.json()
-            ).message,
-            'Move to billing',
-            'Payment Required'
-          )
-        ) {
-          window.open('/billing', '_blank');
-          return false;
-        }
-        return true;
-      }
       return true;
     },
     []

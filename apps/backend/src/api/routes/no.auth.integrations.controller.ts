@@ -198,17 +198,6 @@ export class NoAuthIntegrationsController {
       }
     }
 
-    if (
-      process.env.STRIPE_PUBLISHABLE_KEY &&
-      org.isTrailing &&
-      (await this._integrationService.checkPreviousConnections(
-        org.id,
-        String(id)
-      ))
-    ) {
-      throw new HttpException('', 412);
-    }
-
     const createUpdate =
       await this._integrationService.createOrUpdateIntegration(
         additionalSettings,

@@ -13,16 +13,12 @@ model Organization {
   name                String
   description         String?
   apiKey              String?
-  paymentId           String?
   streakSince         DateTime?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
-  allowTrial          Boolean              @default(false)
-  isTrailing          Boolean              @default(false)
   shortlink           ShortLinkPreference  @default(ASK)
   autoPost            AutoPost[]
   Comments            Comments[]
-  credits             Credits[]
   customers           Customer[]
   errors              Errors[]
   github              GitHub[]
@@ -35,7 +31,6 @@ model Organization {
   submittedPost       Post[]               @relation("submittedForOrg")
   sets                Sets[]
   signatures          Signatures[]
-  subscription        Subscription?
   tags                Tags[]
   thirdParty          ThirdParty[]
   usedCodes           UsedCodes[]
@@ -46,7 +41,6 @@ model Organization {
 
   @@index([apiKey])
   @@index([streakSince])
-  @@index([paymentId])
 }
 
 model Tags {
@@ -265,37 +259,6 @@ model SocialMediaAgencyNiche {
   agency   SocialMediaAgency @relation(fields: [agencyId], references: [id])
 
   @@id([agencyId, niche])
-}
-
-model Credits {
-  id             String       @id @default(uuid())
-  organizationId String
-  credits        Int
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  type           String       @default("ai_images")
-  organization   Organization @relation(fields: [organizationId], references: [id])
-
-  @@index([organizationId])
-  @@index([createdAt])
-}
-
-model Subscription {
-  id               String           @id @default(cuid())
-  organizationId   String           @unique
-  subscriptionTier SubscriptionTier
-  identifier       String?
-  cancelAt         DateTime?
-  period           Period
-  totalChannels    Int
-  isLifetime       Boolean          @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  deletedAt        DateTime?
-  organization     Organization     @relation(fields: [organizationId], references: [id])
-
-  @@index([organizationId])
-  @@index([deletedAt])
 }
 
 model Customer {
@@ -903,18 +866,6 @@ enum State {
   PUBLISHED
   ERROR
   DRAFT
-}
-
-enum SubscriptionTier {
-  STANDARD
-  PRO
-  TEAM
-  ULTIMATE
-}
-
-enum Period {
-  MONTHLY
-  YEARLY
 }
 
 enum Provider {

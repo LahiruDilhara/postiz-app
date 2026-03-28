@@ -3,7 +3,7 @@
 import { AddProviderButton } from '@gitroom/frontend/components/launches/add.provider.component';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import SafeImage from '@gitroom/react/helpers/safe.image';
-import { capitalize, groupBy, orderBy } from 'lodash';
+import { groupBy, orderBy } from 'lodash';
 import { CalendarWeekProvider } from '@gitroom/frontend/components/launches/calendar.context';
 import { Filters } from '@gitroom/frontend/components/launches/filters';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
@@ -20,7 +20,6 @@ import { Calendar } from './calendar';
 import { useDrag, useDrop } from 'react-dnd';
 import { DNDProvider } from '@gitroom/frontend/components/launches/helpers/dnd.provider';
 import { GeneratorComponent } from './generator/generator';
-import { useVariables } from '@gitroom/react/helpers/variable.context';
 import { NewPost } from '@gitroom/frontend/components/launches/new.post';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
@@ -352,7 +351,6 @@ export const MenuComponent: FC<
 export const LaunchesComponent = () => {
   const fetch = useFetch();
   const user = useUser();
-  const { billingEnabled } = useVariables();
   const router = useRouter();
   const search = useSearchParams();
   const toast = useToaster();
@@ -539,9 +537,7 @@ export const LaunchesComponent = () => {
               <AddProviderButton update={() => update(true)} />
               <div className="flex gap-[8px] group-[.sidebar]:flex-col">
                 {sortedIntegrations?.length > 0 && <NewPost />}
-                {sortedIntegrations?.length > 0 &&
-                  user?.tier?.ai &&
-                  billingEnabled && <GeneratorComponent />}
+                {sortedIntegrations?.length > 0 && <GeneratorComponent />}
               </div>
             </div>
             <div className="gap-[32px] flex flex-col select-none flex-1">
@@ -581,9 +577,6 @@ export const LaunchesComponent = () => {
               ))}
             </div>
             <div className="mt-[5px] text-center flex flex-col">
-              {billingEnabled && user?.isLifetime && (
-                <div>{capitalize(user?.tier?.current || '')} tier</div>
-              )}
               <div>
                 {process.env.NEXT_PUBLIC_VERSION
                   ? process.env.NEXT_PUBLIC_VERSION

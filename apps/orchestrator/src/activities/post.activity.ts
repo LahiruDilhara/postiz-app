@@ -22,8 +22,6 @@ import {
   organizationId,
   postId as postIdSearchParam,
 } from '@gitroom/nestjs-libraries/temporal/temporal.search.attribute';
-import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
-
 @Injectable()
 @Activity()
 export class PostActivity {
@@ -34,8 +32,7 @@ export class PostActivity {
     private _integrationService: IntegrationService,
     private _refreshIntegrationService: RefreshIntegrationService,
     private _webhookService: WebhooksService,
-    private _temporalService: TemporalService,
-    private _subscriptionService: SubscriptionService
+    private _temporalService: TemporalService
   ) {}
 
   @ActivityMethod()
@@ -85,13 +82,6 @@ export class PostActivity {
 
   @ActivityMethod()
   async getPostsList(orgId: string, postId: string) {
-    if (process.env.STRIPE_SECRET_KEY) {
-      const subscription = await this._subscriptionService.getSubscription(orgId);
-      if (!subscription) {
-        return [];
-      }
-    }
-
     const getPosts = await this._postService.getPostsRecursively(
       postId,
       true,

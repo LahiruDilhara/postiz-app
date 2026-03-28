@@ -15,7 +15,6 @@ import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.reque
 import { Organization, User } from '@prisma/client';
 import { IntegrationFunctionDto } from '@gitroom/nestjs-libraries/dtos/integrations/integration.function.dto';
 import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
-import { pricing } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserFromRequest } from '@gitroom/nestjs-libraries/user/user.from.request';
 import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.service';
@@ -32,6 +31,8 @@ import {
 } from '@gitroom/backend/services/auth/permissions/permission.exception.class';
 import { uniqBy } from 'lodash';
 import { RefreshIntegrationService } from '@gitroom/nestjs-libraries/integrations/refresh.integration.service';
+
+const MAX_CHANNELS_PER_ORG = 100_000;
 
 @ApiTags('Integrations')
 @Controller('/integrations')
@@ -387,8 +388,7 @@ export class IntegrationsController {
   ) {
     return this._integrationService.enableChannel(
       org.id,
-      // @ts-ignore
-      org?.subscription?.totalChannels || pricing.FREE.channel,
+      MAX_CHANNELS_PER_ORG,
       id
     );
   }

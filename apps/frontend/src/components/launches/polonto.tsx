@@ -19,7 +19,6 @@ import ZoomButtons from 'polotno/toolbar/zoom-buttons';
 import { Button } from '@gitroom/react/form/button';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { PictureGeneratorSection } from '@gitroom/frontend/components/launches/polonto/polonto.picture.generation';
-import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { loadVars } from '@gitroom/react/helpers/variable.context';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useLaunchStore } from '@gitroom/frontend/components/new-launch/store';
@@ -88,13 +87,9 @@ const Polonto: FC<{
     };
   }, []);
 
-  const user = useUser();
   const features = useMemo(() => {
-    return [
-      ...DEFAULT_SECTIONS,
-      ...(user?.tier?.image_generator ? [PictureGeneratorSection] : []),
-    ] as any[];
-  }, [user?.tier?.image_generator]);
+    return [...DEFAULT_SECTIONS, PictureGeneratorSection] as any[];
+  }, []);
   useEffect(() => {
     store.addPage({
       width: props.width || 540,

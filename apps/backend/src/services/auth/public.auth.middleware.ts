@@ -28,12 +28,6 @@ export class PublicAuthMiddleware implements NestMiddleware {
         }
 
         const org = authorization.organization;
-        if (!!process.env.STRIPE_SECRET_KEY && !org.subscription) {
-          res
-            .status(HttpStatus.UNAUTHORIZED)
-            .json({ msg: 'No subscription found' });
-          return;
-        }
 
         // @ts-ignore
         req.org = { ...org, users: [{ users: { role: 'SUPERADMIN' } }] };
@@ -43,13 +37,6 @@ export class PublicAuthMiddleware implements NestMiddleware {
           res
             .status(HttpStatus.UNAUTHORIZED)
             .json({ msg: 'Invalid API key' });
-          return;
-        }
-
-        if (!!process.env.STRIPE_SECRET_KEY && !org.subscription) {
-          res
-            .status(HttpStatus.UNAUTHORIZED)
-            .json({ msg: 'No subscription found' });
           return;
         }
 

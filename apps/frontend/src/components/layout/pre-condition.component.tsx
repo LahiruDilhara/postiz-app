@@ -11,18 +11,10 @@ export const PreConditionComponentModal: FC = () => {
       <div className="whitespace-pre-line">
         This social channel was connected previously to another Postiz account.
         {'\n'}
-        To continue, please fast-track your trial for an immediate charge.{'\n'}
-        {'\n'}
-        ** Please be advised that the account will not eligible for a refund,
-        and the charge is final.
+        Contact your administrator if you need access restored.
       </div>
       <div className="flex gap-[2px] justify-center">
-        <Button
-          onClick={() => (window.location.href = '/billing?finishTrial=true')}
-        >
-          Fast track - Charge me now
-        </Button>
-        <Button onClick={modal.closeCurrent} secondary={true}>Cancel</Button>
+        <Button onClick={modal.closeCurrent}>OK</Button>
       </div>
     </div>
   );

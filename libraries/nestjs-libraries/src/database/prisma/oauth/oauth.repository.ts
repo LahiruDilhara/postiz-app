@@ -167,11 +167,6 @@ export class OAuthRepository {
       where: { id },
       select: {
         organizationId: true,
-        organization: {
-          select: {
-            paymentId: true,
-          }
-        }
       },
       data: {
         accessToken: encryptedToken,
@@ -188,17 +183,7 @@ export class OAuthRepository {
         revokedAt: null,
       },
       include: {
-        organization: {
-          include: {
-            subscription: {
-              select: {
-                subscriptionTier: true,
-                totalChannels: true,
-                isLifetime: true,
-              },
-            },
-          },
-        },
+        organization: true,
         user: {
           select: { id: true },
         },

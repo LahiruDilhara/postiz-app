@@ -1,5 +1,5 @@
 import { PrismaRepository } from '@gitroom/nestjs-libraries/database/prisma/prisma.service';
-import { Role, ShortLinkPreference, SubscriptionTier } from '@prisma/client';
+import { Role, ShortLinkPreference } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '@gitroom/helpers/auth/auth.service';
 import { CreateOrgUserDto } from '@gitroom/nestjs-libraries/dtos/auth/create.org.user.dto';
@@ -22,15 +22,6 @@ export class OrganizationRepository {
       data: {
         name: name ? `${name}###${id}` : `Unnamed User###${id}`,
         apiKey: AuthService.fixedEncryption(makeId(20)),
-        isTrailing: false,
-        subscription: {
-          create: {
-            totalChannels: 1000000,
-            subscriptionTier: 'ULTIMATE',
-            isLifetime: true,
-            period: 'YEARLY',
-          },
-        },
         users: {
           create: {
             role: Role.SUPERADMIN,
@@ -57,15 +48,6 @@ export class OrganizationRepository {
       where: {
         apiKey: api,
       },
-      include: {
-        subscription: {
-          select: {
-            subscriptionTier: true,
-            totalChannels: true,
-            isLifetime: true,
-          },
-        },
-      },
     });
   }
 
@@ -88,13 +70,6 @@ export class OrganizationRepository {
                 disabled: true,
                 role: true,
                 userId: true,
-              },
-            },
-            subscription: {
-              select: {
-                subscriptionTier: true,
-                totalChannels: true,
-                isLifetime: true,
               },
             },
           },
@@ -174,14 +149,6 @@ export class OrganizationRepository {
             role: true,
           },
         },
-        subscription: {
-          select: {
-            subscriptionTier: true,
-            totalChannels: true,
-            isLifetime: true,
-            createdAt: true,
-          },
-        },
       },
     });
   }
@@ -207,24 +174,6 @@ export class OrganizationRepository {
     });
 
     if (checkIfInviteExists) {
-      return false;
-    }
-
-    const checkForSubscription =
-      await this._organization.model.organization.findFirst({
-        where: {
-          id: orgId,
-        },
-        select: {
-          subscription: true,
-        },
-      });
-
-    if (
-      process.env.STRIPE_PUBLISHABLE_KEY &&
-      checkForSubscription?.subscription?.subscriptionTier ===
-        SubscriptionTier.STANDARD
-    ) {
       return false;
     }
 
@@ -258,8 +207,6 @@ export class OrganizationRepository {
       data: {
         name: body.company,
         apiKey: AuthService.fixedEncryption(makeId(20)),
-        allowTrial: true,
-        isTrailing: true,
         users: {
           create: {
             role: Role.SUPERADMIN,
@@ -287,14 +234,6 @@ export class OrganizationRepository {
             user: true,
           },
         },
-      },
-    });
-  }
-
-  getOrgByCustomerId(customerId: string) {
-    return this._organization.model.organization.findFirst({
-      where: {
-        paymentId: customerId,
       },
     });
   }

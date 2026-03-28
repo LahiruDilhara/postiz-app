@@ -111,3 +111,16 @@ export const pricing: PricingInterface = {
     generate_videos: 60,
   },
 };
+
+/** Self-hosted / no billing: all features on; limits are technical only, not sold tiers. */
+export const appFeatures: PricingInnerInterface = {
+  ...pricing.ULTIMATE,
+  current: 'SELF_HOSTED',
+  month_price: 0,
+  year_price: 0,
+  channel: 100_000,
+  posts_per_month: 1_000_000,
+  webhooks: 100_000,
+  image_generation_count: 1_000_000,
+  generate_videos: 1_000_000,
+};

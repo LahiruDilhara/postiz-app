@@ -5,7 +5,6 @@ import {
   Post,
   Req,
   Res,
-  Query,
   Param,
 } from '@nestjs/common';
 import {
@@ -16,7 +15,6 @@ import {
 } from '@copilotkit/runtime';
 import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.request';
 import { Organization } from '@prisma/client';
-import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
 import { MastraAgent } from '@ag-ui/mastra';
 import { MastraService } from '@gitroom/nestjs-libraries/chat/mastra.service';
 import { Request, Response } from 'express';
@@ -32,10 +30,7 @@ export type ChannelsContext = {
 
 @Controller('/copilot')
 export class CopilotController {
-  constructor(
-    private _subscriptionService: SubscriptionService,
-    private _mastraService: MastraService
-  ) {}
+  constructor(private _mastraService: MastraService) {}
   @Post('/chat')
   chatAgent(@Req() req: Request, @Res() res: Response) {
     if (
@@ -102,17 +97,6 @@ export class CopilotController {
     });
 
     return copilotRuntimeHandler.handleRequest(req, res);
-  }
-
-  @Get('/credits')
-  calculateCredits(
-    @GetOrgFromRequest() organization: Organization,
-    @Query('type') type: 'ai_images' | 'ai_videos'
-  ) {
-    return this._subscriptionService.checkCredits(
-      organization,
-      type || 'ai_images'
-    );
   }
 
   @Get('/:thread/list')

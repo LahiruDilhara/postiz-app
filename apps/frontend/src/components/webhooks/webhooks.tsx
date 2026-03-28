@@ -3,7 +3,6 @@
 import React, { FC, Fragment, useCallback, useState } from 'react';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import useSWR from 'swr';
-import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { Button } from '@gitroom/react/form/button';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { Input } from '@gitroom/react/form/input';
@@ -19,7 +18,6 @@ import { useT } from '@gitroom/react/translation/get.transation.service.client';
 
 export const Webhooks: FC = () => {
   const fetch = useFetch();
-  const user = useUser();
   const modal = useModals();
   const toaster = useToaster();
   const t = useT();
@@ -61,7 +59,7 @@ export const Webhooks: FC = () => {
   return (
     <div className="flex flex-col">
       <h3 className="text-[20px]">
-        {t('webhooks', 'Webhooks')} ({data?.length || 0}/{user?.tier?.webhooks})
+        {t('webhooks', 'Webhooks')} ({data?.length || 0})
       </h3>
       <div className="text-customColor18 mt-[4px]">
         {t(
